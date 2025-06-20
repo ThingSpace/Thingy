@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @unique @default(uuid())
+  username      String     @unique
+  password      String
+  email         String?
+  createdAt     DateTime   @default(now())
+  styling       Int        @default(0)
+  isBlacklisted Boolean    @default(false)
+  acceptedRules Boolean    @default(false)
+  acceptedTerms Boolean    @default(false)
+  role          Role       @default(USER)
+  comments      Comment[]
+  journals      Journal[]
+  posts         Post[]
+  feedbacks     Feedback[]
+  apiKeys       ApiKey[]
+}
+
+model Post {
+  id          String    @id @unique @default(uuid())
+  text        String
+  at          DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  userId      String?
+  isPublished Boolean   @default(true)
+  User        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Comment     Comment[]
+  isFlagged   Boolean?  @default(false)
+  flagReason  String?
+  needsReview Boolean?  @default(false)
+  moderationScores Json?
+}
+
+model Comment {
+  id      String    @id @unique @default(uuid())
+  text    String
+  at      DateTime? @default(now())
+  postsId String
+  userId  String
+  post    Post      @relation(fields: [postsId], references: [id])
+  author  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Journal {
+  id        String    @id @unique @default(uuid())
+  title     String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  userId    String
+  styling   Int       @default(0)
+  isPublic  Boolean   @default(false)
+  isFlagged Boolean   @default(false)
+  flagReason String?
+  needsReview Boolean? @default(false)
+  moderationScores Json?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   Entry[]
+}
+
+model Entry {
+  id        String    @id @unique @default(uuid())
+  title     String
+  text      String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  authorId  String
+  journalId String
+  journal   Journal   @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  isFlagged Boolean?   @default(false)
+  flagReason String?
+  needsReview Boolean?  @default(false)
+  moderationScores Json?
+}
+
+model Feedback {
+  id        String    @id @unique @default(uuid())
+  text      String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  authorId  String?
+  author    User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  adminId   String
+  createdAt DateTime @default(now())
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  thingyMod Boolean  @default(false)
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+  USER
+}

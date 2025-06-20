@@ -1,0 +1,15 @@
+/node_modules
+/dist
+.env
+.env.*
+bun.lock
+bun.lockb
+/prisma/dev.db
+/prisma/dev.db-journal
+*.log
+*.sqlite
+*.sqlite-journal
+.idea
+.vscode
+.DS_Store
+bun.lockb
