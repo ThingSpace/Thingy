@@ -9,10 +9,10 @@ import crypto from 'crypto'
  * @param {Elysia} app - The Elysia app instance.
  * @returns {Elysia}
  */
-export const authRoute = (app: Elysia) =>
+export const authRoute = (app: Elysia): Elysia =>
     app.post(
         '/auth',
-        async ({ body }) => {
+        async ({ body }): Promise<{ apiKey?: string; error?: string }> => {
             const { username, password } = body as { username: string; password: string }
             if (!username || !password) {
                 return { error: 'Username and password required' }

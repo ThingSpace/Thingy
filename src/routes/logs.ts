@@ -12,14 +12,16 @@ import { prisma } from '../config/prisma'
 export const logsRoute = (app: Elysia) =>
     app.get(
         '/logs',
-        async ({ headers }) => {
+        async ({ headers, set }) => {
             const apiKey = headers['x-api-key']
             if (!apiKey || typeof apiKey !== 'string') {
+                set.status = 401
                 return { error: 'API key required' }
             }
 
             const keyRecord = await prisma.apiKey.findUnique({ where: { key: apiKey } })
             if (!keyRecord) {
+                set.status = 401
                 return { error: 'Invalid API key' }
             }
 
@@ -30,6 +32,14 @@ export const logsRoute = (app: Elysia) =>
                 tags: ['Moderation'],
                 summary: 'Get moderation logs',
                 description: 'Returns the moderation logs. Requires API key.',
+                parameters: [
+                    {
+                        name: 'x-api-key',
+                        in: 'header',
+                        required: true,
+                        schema: { type: 'string' }
+                    }
+                ],
                 responses: {
                     200: {
                         description: 'Logs array',
@@ -38,6 +48,19 @@ export const logsRoute = (app: Elysia) =>
                                 schema: {
                                     type: 'array',
                                     items: { type: 'string' }
+                                }
+                            }
+                        }
+                    },
+                    401: {
+                        description: 'Unauthorized - API key required or invalid',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        error: { type: 'string' }
+                                    }
                                 }
                             }
                         }

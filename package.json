@@ -12,7 +12,7 @@
     "license": "AGPL-3.0-only",
     "author": "Pixelated <https://codemeapixel.dev>",
     "scripts": {
-        "build": "bun build src/index.ts",
+        "build": "tsc",
         "dev": "bun run --watch src/index.ts",
         "format": "prettier --check .",
         "format:fix": "prettier --write .",

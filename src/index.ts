@@ -4,9 +4,11 @@ import { moderationWorker } from './moderation/worker'
 import { logsRoute } from './routes/logs'
 import { stateRoute } from './routes/state'
 import { authRoute } from './routes/auth'
-import { moderationAdminRoute, resultRoute } from './routes/result'
+import { resultRoute } from './routes/result'
 
-const app = new Elysia()
+const port = Number(process.env.PORT) || 9422
+
+new Elysia()
     .use(
         swagger({
             path: '/docs',
@@ -25,6 +27,6 @@ const app = new Elysia()
     .use(authRoute)
     .use(logsRoute)
     .use(resultRoute)
-    .listen(process.env.PORT)
+    .listen(port)
 
-console.log('Elysia API server started on port 3000')
+console.log(`Elysia API server started on port ${port}`)
